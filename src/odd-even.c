@@ -14,7 +14,30 @@
 
 void sequential_oddeven_sort(uint64_t *T, const uint64_t size) {
     /* TODO: sequential implementation of odd-even sort */
-
+    bool sorted = false;
+    while(!sorted)
+    {   
+        sorted = true;
+        for (uint64_t i = 0; i < size - 1; i+=2)
+        {
+            if( T[i]>T[i+1]){
+                uint64_t temp = T[i];
+                T[i]=T[i+1];
+                T[i+1]= temp;
+                sorted = false;
+            }
+        }
+        for (uint64_t i = 1; i < size - 1; i+=2)
+        {
+            if( T[i]>T[i+1]){
+                uint64_t temp = T[i];
+                T[i]=T[i+1];
+                T[i+1]= temp;
+                sorted = false;
+            }
+        }
+            
+    }
     return;
 }
 
