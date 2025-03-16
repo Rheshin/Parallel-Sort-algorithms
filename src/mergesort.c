@@ -51,7 +51,12 @@ void merge(uint64_t *T, const uint64_t size) {
 
 void sequential_merge_sort(uint64_t *T, const uint64_t size) {
     /* TODO: sequential implementation of merge sort */
+    if( size == 2) return merge(T,size / 2 );
 
+    uint64_t half = size/2;
+    sequential_merge_sort(T + half, size-half);
+    sequential_merge_sort(T,half);
+    merge(T,half);
     return;
 }
 
