@@ -56,7 +56,13 @@ Meanwhile the Odd-Even algorithm does not have this restriction, since each iter
 This makes the Odd-Even algorithm more parallelizable.
 
 #### **Implementation Details**  
-a
+There is a similar point with the bubble sort algorithm, we have a shared variable named swaps, that checks if there was any element swap. 
+The sorting process continues until no further swaps occur, reaching a fixed point.
+
+Processing Odd elements and then even elements allows us to have a set of distinct pairs to sort each time, Meaning that we can introduce parallelizing in each loop iteration ( of one the two parts ).
+allowing us to upscale our performance since there is parallelism in each part of the algorithm.
+
+We added the OPENMP directive " #pragma omp parallel for reduction(swaps)"  to ensure that the swap variable incrementation is handled correctly, this variable shared in a critical section, which could lead to a race condition.
 
 
 ---
