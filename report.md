@@ -14,7 +14,6 @@ Additionally, a performance analysis of these algorithms was conducted to evalua
 
 ### **2.1 Bubble Sort**  
 #### **Implementation Details**  
-expliquer comment est faite la separation en chunks
 
 We start the algorithm by splitting the array into equal-size chunks. Each thread handles one chunk and sorts it.
 This method avoids any conflict between threads when sorting.
@@ -31,7 +30,6 @@ This limitation down-scales performance.
 ### **2.2 MergeSort with Tasks**  
 #### **Implementation Details**  
 
-expliquer l'utilisation des tasks
 
 The parallelized merge-sort algorithm is very similar to the serialized one.
 We  introduced the concept of tasks  in each recursive call. This allows a single thread to create a recursive call, and inside that call, the work is done in parallel.
@@ -133,7 +131,7 @@ The following graphs show how the execution time of each algorithm scales with i
 
 ---
 
-## **Conclusion**  
+## **4. Conclusion**  
 The test results mostly aligned with theoretical expectations, except for merge sort, which should have benefited the most from parallelization. Instead, it saw no speedup or even a decline in performance.  
 
 Possible reasons include:  
@@ -144,4 +142,9 @@ Possible reasons include:
 - Optimizing Merge Sort task creation: Limit the depth at which recursive calls create new tasks to avoid excessive overhead.  
 - Tuning thread scheduling: Experiment with different OpenMP scheduling policies to improve workload distribution.  
 
+---
 
+## **5. References** 
+LLMs Usage: 
+- Report formatting/styling
+- Performance analysis scripting
