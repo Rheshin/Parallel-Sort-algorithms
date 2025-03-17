@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
 #include <time.h>
 
 #include "sorting.h"
@@ -11,48 +12,39 @@
 */
 
 void sequential_bubble_sort(uint64_t *T, const uint64_t size) {
-    /* TODO: sequential implementation of bubble sort */
-    
-    for (int  j = size - 1; j > 0; j--)
-    {
-        /* code */
-        for (uint64_t i = 0; i < j ; i++)
-        {   uint64_t temp_buffer;
-            if( T[i] > T[i+1])
-            {   
+    for (int  j = size - 1; j > 0; j--) {
+        for (uint64_t i = 0; i < j ; i++) {
+            uint64_t temp_buffer;
+            if (T[i] > T[i+1]) {
                 temp_buffer = T[i];
                 T[i] = T[i+1];
                 T[i+1] = temp_buffer;
-                // printf(" value is : %ld \n",temp_buffer);
-            } 
-        }   
+            }
+        }
     }
     return;
 }
 
 void parallel_bubble_sort(uint64_t *T, uint64_t size) {
     int sorted = 0;
-    
+    int num_threads = omp_get_max_threads();
+    uint64_t chunk_size = size / num_threads;
+
     while (!sorted) {
-        sorted = 1;/* optimistic boolean, we set it to true and change it to false it anything has been swapped */
-        
-        // Step 1: Sort chunks in parallel
+        sorted = 1;
+
+
         #pragma omp parallel
         {
-            int num_threads = omp_get_num_threads();
+            // calculate chunk boundaries for this thread
             int thread_id = omp_get_thread_num();
-            
-            // Calculate boundaries
-            uint64_t chunk_size = size / num_threads;
-            /* for each thread having a "thread_id" we attributes it a unique starting and ending point ( no intersect ) */
             uint64_t start = thread_id * chunk_size;
             uint64_t end = (thread_id == num_threads - 1) ? size : (thread_id + 1) * chunk_size;
-            
-            // Do a bubble sort on each chunk
+
+            // bubble sort the chunk
             for (uint64_t i = start; i < end - 1; i++) {
                 for (uint64_t j = start; j < end - 1; j++) {
                     if (T[j] > T[j + 1]) {
-                        // Swap
                         uint64_t temp = T[j];
                         T[j] = T[j + 1];
                         T[j + 1] = temp;
@@ -61,13 +53,14 @@ void parallel_bubble_sort(uint64_t *T, uint64_t size) {
                 }
             }
         }
-        
-        for (int i = 0; i < size - 1; i++) {
-            if (T[i] > T[i + 1]) {
-                // Swap
-                uint64_t temp = T[i];
-                T[i] = T[i + 1];
-                T[i + 1] = temp;
+
+        // sequential pass: swap boundaries of adjacent chunks if needed
+        for (int i = 0; i < num_threads - 1; i++) {
+            uint64_t boundary = (i + 1) * chunk_size;
+            if (T[boundary - 1] > T[boundary]) {
+                uint64_t temp = T[boundary - 1];
+                T[boundary - 1] = T[boundary];
+                T[boundary] = temp;
                 sorted = 0;
             }
         }
