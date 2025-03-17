@@ -22,19 +22,26 @@ In the second step, we sort the borders between each pair of chunks.
 If there is a change in any of the two steps, the algorithm runs again.
 
 #### **Limitations & Bugs (if any)**  
-aaa
 
+The second part of our algorithm is not parallelizable, since it goes through the whole array to sort the borders in each of the chunks.
+This limitation down-scales performance. 
 ---
 
 ### **2.2 MergeSort with Tasks**  
 #### **Implementation Details**  
 expliquer l'utilisation des tasks
 
+The parallelized merge-sort algorithm is very similar to the serialized one.
+We  introduced the concept of tasks  in each recursive call. This allows a single thread to create a recursive call, and inside that call, the work is done in parallel.
+
+We added a task wait at the end of each recursive call to ensure the array is sorted only after all sub-parts are processed. This prevents conflicts and poorly managed concurrency.
+
 #### **Optimization Proposal**  
 peut etre utiliser 
 
 #### **Limitations**  
-expliquer que la version parallel est plus lente que sequentielle
+For the moment we have a parallel version that is slower than the sequential one.
+at first we thought that this occured only in small arrays because of the heavy initialization of tasks, but the performance analysis proved us wrong.
 
 ---
 
