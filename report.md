@@ -25,10 +25,12 @@ If there is a change in any of the two steps, the algorithm runs again.
 
 The second part of our algorithm is not parallelizable, since it goes through the whole array to sort the borders in each of the chunks.
 This limitation down-scales performance. 
+
 ---
 
 ### **2.2 MergeSort with Tasks**  
 #### **Implementation Details**  
+
 expliquer l'utilisation des tasks
 
 The parallelized merge-sort algorithm is very similar to the serialized one.
@@ -37,7 +39,8 @@ We  introduced the concept of tasks  in each recursive call. This allows a singl
 We added a task wait at the end of each recursive call to ensure the array is sorted only after all sub-parts are processed. This prevents conflicts and poorly managed concurrency.
 
 #### **Optimization Proposal**  
-peut etre utiliser 
+If the array is really small, we should use a sequential workspace, we should avoir intializing tasks for small work loads.
+This could allow our algorithm to have a correct performance in every situation.
 
 #### **Limitations**  
 For the moment we have a parallel version that is slower than the sequential one.
@@ -47,7 +50,10 @@ at first we thought that this occured only in small arrays because of the heavy 
 
 ### **2.3 Odd-Even Sort**  
 #### **Why is it more parallelizable than Bubble Sort?**  
-a
+
+The bubble sort algorithm is a strictly sequential sort algorithm, there is dependencies between each iteration, forcing to have a part that is not parallelized.
+Meanwhile the Odd-Even algorithm does not have this restriction, since each iteration is independant for others ( there is no shared element ).
+This makes the Odd-Even algorithm more parallelizable.
 
 #### **Implementation Details**  
 a
