@@ -13,39 +13,58 @@
 */
 
 void sequential_oddeven_sort(uint64_t *T, const uint64_t size) {
-    /* TODO: sequential implementation of odd-even sort */
-    bool sorted = false;
-    while(!sorted)
-    {   
-        sorted = true;
-        for (uint64_t i = 0; i < size - 1; i+=2)
-        {
-            if( T[i]>T[i+1]){
-                uint64_t temp = T[i];
-                T[i]=T[i+1];
-                T[i+1]= temp;
-                sorted = false;
+    int swaps;
+    do {
+        swaps = 0;
+
+        // odd
+        for (uint64_t i = 1; i < size - 1; i += 2) {
+            if (T[i] > T[i + 1]) {
+                uint64_t tmp = T[i];
+                T[i] = T[i + 1];
+                T[i + 1] = tmp;
+                swaps++;
             }
         }
-        for (uint64_t i = 1; i < size - 1; i+=2)
-        {
-            if( T[i]>T[i+1]){
-                uint64_t temp = T[i];
-                T[i]=T[i+1];
-                T[i+1]= temp;
-                sorted = false;
+
+        // evne
+        for (uint64_t i = 0; i < size - 1; i += 2) {
+            if (T[i] > T[i + 1]) {
+                uint64_t tmp = T[i];
+                T[i] = T[i + 1];
+                T[i + 1] = tmp;
+                swaps++;
             }
         }
-            
-    }
-    return;
+    } while (swaps > 0);
 }
-
 void parallel_oddeven_sort(uint64_t *T, const uint64_t size) {
+    int swaps;
+    do {
+        swaps = 0;
 
-    /* TODO: parallel implementation of odd-even sort */
+        // odd
+        #pragma omp parallel for reduction(+:swaps)
+        for (uint64_t i = 1; i < size - 1; i += 2) {
+            if (T[i] > T[i + 1]) {
+                uint64_t temp = T[i];
+                T[i] = T[i + 1];
+                T[i + 1] = temp;
+                swaps++;
+            }
+        }
 
-    return;
+        // even
+        #pragma omp parallel for reduction(+:swaps)
+        for (uint64_t i = 0; i < size - 1; i += 2) {
+            if (T[i] > T[i + 1]) {
+                uint64_t temp = T[i];
+                T[i] = T[i + 1];
+                T[i + 1] = temp;
+                swaps++;
+            }
+        }
+    } while (swaps > 0);
 }
 
 int main(int argc, char **argv) {
