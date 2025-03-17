@@ -61,8 +61,23 @@ void sequential_merge_sort(uint64_t *T, const uint64_t size) {
     merge(T, half);
 }
 
+void parallel_merge_sort_rec(uint64_t* T, const uint64_t size) {
+    if (size <= 1) return;
+    uint64_t half = size / 2;
+
+    #pragma omp task /* creating a task for a single thread to avoid conflicts */
+        parallel_merge_sort_rec(T + half, size - half);
+
+    #pragma omp task /* creating a task for a single thread to avoid conflicts */
+        parallel_merge_sort_rec(T,half);
+
+    #pragma omp taskwait 
+        merge(T, half);
+
+    return;
+}
+
 void parallel_merge_sort(uint64_t *T, const uint64_t size) {
-    /* TODO: parallel implementation of merge sort */
     #pragma omp parallel
     {   /* creating the parallel env*/
         #pragma omp single
@@ -71,25 +86,8 @@ void parallel_merge_sort(uint64_t *T, const uint64_t size) {
         }
     }
     return;
-
 }
-void parallel_merge_sort_rec(uint64_t* T, const uint64_t size)
-{
-    if( size == 1) return; /* basic case  */
-    uint64_t half = size/2;
 
-    #pragma omp task /* creating a task for a single thread to avoid conflicts */
-        parallel_merge_sort_rec(T + half, size-half);
-
-    #pragma omp task /* creating a task for a single thread to avoid conflicts */
-        parallel_merge_sort_rec(T,half);
-
-    #pragma omp taskwait /* waiting for the previous tasks and child-tasks to end before launching the merge, 
-                            meaning that we don't want to sort something not finished */
-        merge(T,half);
-
-    return;   
-}
 
 int main(int argc, char **argv) {
     // Init cpu_stats to measure CPU cycles and elapsed time
