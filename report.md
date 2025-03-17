@@ -69,16 +69,79 @@ We added the OPENMP directive " #pragma omp parallel for reduction(swaps)"  to e
 
 ## **3. Performance Analysis**  
 **System Specifications:**  
-- **Processor:** AMD Ryzen 5 7500F 6-Core 12-Threads Processor 3.70 GHz
-- **RAM:** 32GB
-- **Compiler:** gcc
-- **System:** Ubuntu 24.04 (through Windows WSL2)
+- **Processor:** AMD Ryzen 5 7500F 6-Core 12-Threads Processor 3.70 GHz  
+- **RAM:** 32GB  
+- **Compiler:** GCC  
+- **System:** Ubuntu 24.04 (through Windows WSL2)  
 
-### **Performance Evaluation**  
-graph resultat -> observations -> conclusion
+### **Speedup vs Threads**  
+The following graphs illustrate the speedup achieved by each sorting algorithm when increasing the number of threads. The speedup is calculated as:  
+
+#### **Bubble Sort**
+![Bubble Sort Speedup](https://github.com/Rheshin/Parallel-Sort-algorithms/blob/main/perf_analysis/speedup_vs_threads_bubble.png?raw=true)
+
+#### **Merge Sort**
+![Merge Sort Speedup](https://github.com/Rheshin/Parallel-Sort-algorithms/blob/main/perf_analysis/speedup_vs_threads_mergesort.png?raw=true)
+
+#### **Odd-Even Sort**
+![Odd-Even Sort Speedup](https://github.com/Rheshin/Parallel-Sort-algorithms/blob/main/perf_analysis/speedup_vs_threads_odd-even.png?raw=true)
+
+### **Expected vs Actual Behavior**  
+
+#### **Bubble Sort**
+- **Expected:** Limited speedup due to its inherently sequential nature, but a small improvement due to parallel processing of chunks.  
+- **Actual:** Little to no speedup (0.004 → 0.012), confirming poor scalability.
+
+#### **Merge Sort**
+- **Expected:** Significant speedup due to its divide-and-conquer nature, where each recursive call should be independently parallelizable, leading to a logarithmic reduction in execution time.  
+- **Actual:** Performance degraded (0.05 → 0.00 speedup). This result is surprising, as merge sort should benefit a lot from parallelization.
+
+#### **Odd-Even Sort**
+- **Expected:** Moderate speedup due to its parallel-friendly nature (each phase can be processed independently). 
+- **Actual:** Speedup decreases (0.82 → 0.22). This suggests that beyond a small number of threads, synchronization overhead outweighs the benefits of parallelization.  
 
 ---
 
-## **4. Conclusion**  
+### **Execution Time vs Problem Size**  
+The following graphs show how the execution time of each algorithm scales with increasing problem size. The tests were conducted with different numbers of threads, as shown in the plots.
+
+#### **Bubble Sort**
+![Bubble Sort Execution Time](https://github.com/Rheshin/Parallel-Sort-algorithms/blob/main/perf_analysis/execution_time_vs_problem_size_bubble.png?raw=true)
+
+#### **Merge Sort**
+![Merge Sort Execution Time](https://github.com/Rheshin/Parallel-Sort-algorithms/blob/main/perf_analysis/execution_time_vs_problem_size_mergesort.png?raw=true)
+
+#### **Odd-Even Sort**
+![Odd-Even Sort Execution Time](https://github.com/Rheshin/Parallel-Sort-algorithms/blob/main/perf_analysis/execution_time_vs_problem_size_odd-even.png?raw=true)
+
+### **Expected vs Actual Behavior**  
+
+#### **Bubble Sort**
+- **Expected:** A sharp increase in execution time with problem size, since it has a time complexity of **O(n²)**.  
+- **Actual:** Execution time increases significantly, with little benefit from parallelism. **Expected behavior confirmed.**  
+
+#### **Merge Sort**
+- **Expected:** Execution time should grow **logarithmically (O(n log n))**, with parallel execution reducing the time significantly for larger inputs.  
+- **Actual:** **Execution time did not improve with parallelization.** This is unexpected and indicates a problem with:
+  - **Task creation overhead.** Too many small tasks can slow execution.
+  - **Inefficient memory access.** The merge phase may be causing excessive cache misses.
+  - **Synchronization costs.** If threads are frequently waiting on each other, parallelism is ineffective.
+
+#### **Odd-Even Sort**
+- **Expected:** Execution time should scale better than Bubble Sort but still be less efficient than Merge Sort.  
+- **Actual:** The parallel version **performs worse as the number of threads increases.** This suggests that at higher thread counts, **contention between threads for synchronization dominates execution time**, reducing performance.  
+
+---
+
+## **Conclusion**  
+The test results mostly aligned with theoretical expectations, except for merge sort, which should have benefited the most from parallelization. Instead, it saw no speedup or even a decline in performance.  
+
+Possible reasons include:  
+- Too much overhead from task creation. OpenMP task parallelism may not be efficient for small subarrays.  
+- Poor load balancing. Some threads may have finishde early while others handled larger portions of work.  
+
+**Future improvements could involve:**  
+- Optimizing Merge Sort task creation: Limit the depth at which recursive calls create new tasks to avoid excessive overhead.  
+- Tuning thread scheduling: Experiment with different OpenMP scheduling policies to improve workload distribution.  
 
 
