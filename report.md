@@ -16,6 +16,11 @@ Additionally, a performance analysis of these algorithms was conducted to evalua
 #### **Implementation Details**  
 expliquer comment est faite la separation en chunks
 
+We start the algorithm by splitting the array into equal-size chunks. Each thread handles one chunk and sorts it.
+This method avoids any conflict between threads when sorting.
+In the second step, we sort the borders between each pair of chunks.
+If there is a change in any of the two steps, the algorithm runs again.
+
 #### **Limitations & Bugs (if any)**  
 aaa
 
